@@ -35,3 +35,7 @@ allStates.df <- combined.df %>%
 
 final.df <- full_join(combined.df, allStates.df) %>%
   mutate(Rate = round(Deaths / Population * 100000, digits = 2))
+
+# Vectors and other variables to be used in Shiny
+
+year.vec <- c(1999:2016)
