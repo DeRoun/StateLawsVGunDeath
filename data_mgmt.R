@@ -10,27 +10,28 @@ orig.GL <- read.csv(file = "data/raw_state_gun_laws_data.csv", stringsAsFactor =
 
 orig.CDC <- read.csv(file = "data/raw_cdc_gun_deaths.csv", stringsAsFactor = F, fileEncoding="UTF-8-BOM")
 
+# Simplifies CDC gun death data
+
+simplify.CDC <- select(orig.CDC, State, Year, Deaths, Population)
+
 # Simplifies firearm law data
 
 simplify.GL <- select(orig.GL, State = state, Year = year, LawTotal = lawtotal)
 
 # Combines CDC and Gun law datasets by state and year
 
-combined.df <- left_join(orig.CDC, simplify.GL)
+combined.df <- left_join(simplify.CDC, simplify.GL)
 
-# Function that takes in a state name and outputs a data from of that state
-# gun death and gun law information from 1999-2016.
+# Adds a "All States" state category that takes the combined total of all states for that year.
 
-simplify <- function(stateName){
-  drop.cols <- c("State.Code", "Year.Code", "X..of.Total.Deaths")
-  df <- combined.df %>%
-    filter(State == stateName) %>%
-    select(-one_of(drop.cols))
-  assign(eval(stateName), df, .GlobalEnv)
-  rm(drop.cols)
-}
+allStates.df <- combined.df %>%
+                group_by(Year) %>%
+                summarise(Deaths = sum(Deaths), Population = sum(Population),
+                          LawTotal = sum(LawTotal, na.rm=TRUE)) %>%
+                mutate(State = "All States")
 
-# Repeats simplify function for each state outputting 50 data frames names as the state
-# i.e California, Oregon, etc.
+# Adds the new "All States" rows to the combined data frame and creates a Rate column
+# of the rate of death per 100,000 people
 
-lapply(as.list(state.name), simplify)
+final.df <- full_join(combined.df, allStates.df) %>%
+  mutate(Rate = round(Deaths / Population * 100000, digits = 2))
