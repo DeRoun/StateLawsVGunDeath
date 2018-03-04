@@ -8,7 +8,8 @@ suppressPackageStartupMessages(library("htmltools"))
 suppressPackageStartupMessages(library("mapview"))
 suppressPackageStartupMessages(library("htmlwidgets"))
 suppressPackageStartupMessages(library("albersusa"))
-library("ggthemr")
+suppressPackageStartupMessages(library("ggthemr"))
+
 server <- function(input, output){
   
   # Map data from albersusa package for USA map with compatable alaska and hawaii projections
