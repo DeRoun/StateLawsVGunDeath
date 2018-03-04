@@ -15,7 +15,7 @@ sidebar <- dashboardSidebar(
     ),
     
     menuItem("By States", tabName = "by", icon = icon("map-pin")),
-      conditionalPanel("input.sidebarmenu === 'a'",
+      conditionalPanel("input.sidebarmenu === 'by'",
         selectInput("stateChoice.Bs", label = "Select State", 
                          choices = state.name),
         selectInput("yearChoice.Bs", label = "Select Year", 
@@ -49,19 +49,19 @@ body <- dashboardBody(
     tabItem(tabName = "by",
             fluidRow(
               box(
-                title = "State", status = "primary", solidHeader = TRUE,
+                title = "State Name", status = "danger", solidHeader = TRUE,
                 collapsible = FALSE,
                 leafletOutput("map.Bs")
               ),
               box(
                 status = "primary", solidHeader = TRUE,
                 collapsible = FALSE,
-                tableOutput("lineGraph.Bs")
+                plotOutput("lineGraph.Bs")
               ),
               box(
-                status = "primary", solidHeader = TRUE,
+                title = "State Name Data per Year", status = "danger", solidHeader = TRUE,
                 collapsible = FALSE,
-                plotOutput("table.Bs")
+                tableOutput("table.Bs")
               )
             )
     )

@@ -16,6 +16,7 @@ server <- function(input, output){
 
   spdf <- rmapshaper::ms_simplify(usa_composite())
   
+  
   output$map.As <- renderLeaflet({
     
     # Filters data frame bases on All State Control widgets
@@ -49,7 +50,7 @@ server <- function(input, output){
     # Creates Leaflet Plot to be output
     
     leaflet(spdf, options = leafletOptions(crs = epsg2163)) %>%
-      setView(-96, 37.8, 4) %>%
+      setView(-96, 37.8, 3) %>%
       addPolygons(fillColor = pal(allStates$Rate),
                   weight = 1,
                   smoothFactor = 0.5,
@@ -69,6 +70,83 @@ server <- function(input, output){
                 position = "bottomright")
     
   })
+  
+  output$map.Bs <- renderLeaflet({
+    
+    # Filters data frame bases on By State Control widgets
+    
+    allStates <- filter(final.df, Year == input$yearChoice.Bs) %>%
+      filter(!State %in% "All States")
+    byStates <- filter(allStates, State == input$stateChoice.Bs)
+    byStates <- byStates[match(spdf$name, byStates$State),]
+    
+    #creates dataframe to be used to center states on map
+    
+    center <- data.frame(state.name, state.center)
+    
+    # Change Alaska Coord
+    center$x[center$x == -127.2500] <- -112
+    center$y[center$y == 49.2500] <- 27
+    # Change Hawaii Coord
+    center$x[center$x == -126.25000] <- -102.3
+    center$y[center$y == 31.7500] <- 24.5
+    
+    center <- filter(center, state.name == input$stateChoice.Bs)
+    
+    # Sets bins for fill color, then creates colorbin with set of colors equal to
+    # the bin in relation to allStates.df$Rate.
+    
+    bins <- seq(2, 35, by = 3)
+    pal <- colorBin(c("#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", 
+                      "#ef3b2c", "#cb181d", "#a50f15", "#67000d"),
+                    domain = allStates$Rate, bins = bins)
+    
+    # Creates projection for hawaii and Alaska on all state map
+    epsg2163 <- leafletCRS(
+      crsClass = "L.Proj.CRS",
+      code = "EPSG:2163",
+      proj4def = "+proj=laea +lat_0=45 +lon_0=-100 +x_0=0 +y_0=0 +a=6370997 +b=6370997 +units=m +no_defs",
+      resolutions = 2^(16:7))
+    
+    # Creates label variable to be used on map
+    
+    labels <- paste("<p>", byStates$State, "</p>",
+                    "<p>", "Gun Death Rate: ", byStates$Rate, "</p>",
+                    "<p>", "Total Gun Laws: ", byStates$LawTotal, "</p>",
+                    sep="")
+    # Creates Leaflet Plot to be output
+    
+    leaflet(spdf, options = leafletOptions(crs = epsg2163)) %>%
+      setView(center$x[1], center$y[1], 4) %>%
+      addPolygons(fillColor = pal(byStates$Rate),
+                  weight = 1,
+                  smoothFactor = 0.5,
+                  color = "white",
+                  fillOpacity = 0.8,
+                  highlight = highlightOptions(
+                    weight = 5,
+                    color = "#666",
+                    dashArray = "",
+                    fillOpacity = 0.7,
+                    bringToFront = TRUE),
+                  label = lapply(labels, HTML)) %>%
+      addLegend(pal = pal,
+                values = allStates$Rate,
+                opacity = 0.7,
+                title = "Rate per 100,000 People",
+                position = "bottomright")
+    
+    
+    
+  })
+  
+  output$table.Bs <-
+    renderTable({
+      byStates <- filter(final.df, State == input$stateChoice.Bs) %>%
+        filter(!State %in% "All States") %>%
+        select(Year, "Number of Total Laws" = LawTotal, "Death Rate (by Firearm)" = Rate)
+      return(byStates)
+    }, align = "ccc")
   
   output$avgGunLawBox.As <-
     renderValueBox({
@@ -100,7 +178,7 @@ server <- function(input, output){
   output$yearChoiceBox.As <-
     renderValueBox({
       valueBox(
-        paste(input$yearChoice.As), "Year Selected", icon = icon("calendar-alt"),
+        paste(input$yearChoice.As), "Year Selected", icon = icon("calendar"),
         color = "yellow")
     })
   
