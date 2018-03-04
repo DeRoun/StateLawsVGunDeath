@@ -38,4 +38,4 @@ final.df <- full_join(combined.df, allStates.df) %>%
 
 # Vectors and other variables to be used in Shiny
 
-year.vec <- c(1999:2016)
+year.vec <- c(allStates.df$Year)
