@@ -1,8 +1,9 @@
 suppressPackageStartupMessages(library("markdown"))
 suppressPackageStartupMessages(library("shiny"))
 suppressPackageStartupMessages(library("leaflet"))
+suppressPackageStartupMessages(library("shinythemes"))
 
-ui <- fluidPage(
+ui <- fluidPage(theme = shinytheme("united"),
   
   navbarPage("Gun Laws & Deaths",
              tabPanel("Home"),
@@ -14,15 +15,15 @@ ui <- fluidPage(
              ),
              tabPanel("By State",
                       sidebarPanel(
-                        selectInput("yearChoice.Bs", label = h3("Select State"), 
+                        selectInput("stateChoice.Bs", label = h3("Select State"), 
                                   choices = state.name),
                         selectInput("yearChoice.Bs", label = h3("Select Year"), 
                                     choices = year.vec)),
                       
-                      fluidRow(column(1,
+                      fluidRow(column(1, align = "center",
                                       plotOutput("map.Bs", hover = "map_hover")
                       ),
-                      column(2,
+                      column(2, align = "center",
                              tableOutput("table.Bs")
                       )),
                       
