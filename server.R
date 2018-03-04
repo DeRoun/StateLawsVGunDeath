@@ -70,7 +70,33 @@ server <- function(input, output){
   })
   
   
-  
+  output$lineGraph.As <- renderPlot({
+    
+    # Create a new data frame "as.data" that filters All State data
+    as.data <- filter(final.df, State == "All States")
+    
+    # Create a graph.As that takes as.data as data and Year as x-axis
+    graph.As <- ggplot(as.data, aes(x = Year))
+    
+    # Add a line graph with Rate as y-axis with color label "Death Rate" and size 1.5 to graph.As
+    graph.As <- graph.As + geom_line(aes(y = Rate, color = "Death Rate"), size = 1.5)
+    
+    # Add a line graph with LawTotal/120 as y-axis with color label "Total Number of Laws" and size 1.5 to graph.As
+    graph.As <- graph.As + geom_line(aes(y = LawTotal/120, colour = "Total Number of Laws"), size = 1.5)
+    
+    # Define a secondary y-axis scale
+    graph.As <- graph.As + scale_y_continuous(sec.axis = sec_axis(trans = ~. * 120, name = "Total Number of Laws"))
+    
+    # Add color to each line graph
+    graph.As <- graph.As + scale_colour_manual(values = c("red", "black"))
+    
+    # Add labels for x-axis, y-axis, and color panel
+    graph.As <- graph.As + labs(y = "Death Rate",
+                                x = "Year", 
+                                colour = "Legend")
+    
+    return(graph.As)
+  })
   
 }
 
