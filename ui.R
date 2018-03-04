@@ -54,7 +54,7 @@ body <- dashboardBody(
                 leafletOutput("map.Bs")
               ),
               box(
-                status = "primary", solidHeader = TRUE,
+                title = "State Name Graph Over Time", status = "danger", solidHeader = TRUE,
                 collapsible = FALSE,
                 plotOutput("lineGraph.Bs")
               ),
