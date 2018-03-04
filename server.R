@@ -69,6 +69,40 @@ server <- function(input, output){
     
   })
   
+  output$avgGunLawBox.As <-
+    renderValueBox({
+      
+      allStates <- filter(final.df, Year == input$yearChoice.As) %>%
+        filter(!State %in% "All States") %>%
+        na.omit(LawTotal) %>%
+        summarise(TotalAvg = mean(LawTotal))
+      avg <- round(allStates$TotalAvg[1], digits = 2)
+      
+      valueBox(
+        paste0(avg), "Avg. Gun Laws per State", icon = icon("balance-scale"),
+        color = "olive")
+    })
+  
+  output$avgRateBox.As <-
+    renderValueBox({
+      
+      allStates <- filter(final.df, Year == input$yearChoice.As) %>%
+        filter(!State %in% "All States") %>%
+        summarise(TotalAvg = mean(Rate))
+      avg <- round(allStates$TotalAvg[1], digits = 2)
+      
+      valueBox(
+        paste0(avg), "Rate of Death per 100k", icon = icon("exclamation-circle"),
+        color = "red")
+    })
+  
+  output$yearChoiceBox.As <-
+    renderValueBox({
+      valueBox(
+        paste(input$yearChoice.As), "Year Selected", icon = icon("calendar-alt"),
+        color = "yellow")
+    })
+  
   
   output$lineGraph.As <- renderPlot({
     
