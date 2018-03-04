@@ -8,7 +8,7 @@ suppressPackageStartupMessages(library("htmltools"))
 suppressPackageStartupMessages(library("mapview"))
 suppressPackageStartupMessages(library("htmlwidgets"))
 suppressPackageStartupMessages(library("albersusa"))
-
+library("ggthemr")
 server <- function(input, output){
   
   # Map data from albersusa package for USA map with compatable alaska and hawaii projections
@@ -72,6 +72,8 @@ server <- function(input, output){
   
   output$lineGraph.As <- renderPlot({
     
+    ggthemr("dust")
+    
     # Create a new data frame "as.data" that filters All State data
     as.data <- filter(final.df, State == "All States")
     
@@ -79,21 +81,21 @@ server <- function(input, output){
     graph.As <- ggplot(as.data, aes(x = Year))
     
     # Add a line graph with Rate as y-axis with color label "Death Rate" and size 1.5 to graph.As
-    graph.As <- graph.As + geom_line(aes(y = Rate, color = "Death Rate"), size = 1.5)
+    graph.As <- graph.As + geom_line(aes(y = Rate, color = "Death Rate"), size = .9) 
+    graph.As <- graph.As + geom_point(aes(y = Rate, color = "Death Rate"), size = 2.2)
     
     # Add a line graph with LawTotal/120 as y-axis with color label "Total Number of Laws" and size 1.5 to graph.As
-    graph.As <- graph.As + geom_line(aes(y = LawTotal/120, colour = "Total Number of Laws"), size = 1.5)
+    graph.As <- graph.As + geom_line(aes(y = LawTotal/120, colour = "Total Number of Laws"), size = .9)
+    graph.As <- graph.As + geom_point(aes(y = LawTotal/120, colour = "Total Number of Laws"), size = 2.2)
     
     # Define a secondary y-axis scale
-    graph.As <- graph.As + scale_y_continuous(sec.axis = sec_axis(trans = ~. * 120, name = "Total Number of Laws"))
-    
-    # Add color to each line graph
-    graph.As <- graph.As + scale_colour_manual(values = c("red", "black"))
+    graph.As <- graph.As + scale_y_continuous(sec.axis = sec_axis(trans = ~. * 120, name = "Total Number of Laws")) +
+      scale_x_continuous(breaks = round(seq(min(as.data$Year), max(as.data$Year), by = 1),1))
     
     # Add labels for x-axis, y-axis, and color panel
     graph.As <- graph.As + labs(y = "Death Rate",
                                 x = "Year", 
-                                colour = "Legend")
+                                colour = "Legend") 
     
     return(graph.As)
   })
