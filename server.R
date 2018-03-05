@@ -16,6 +16,15 @@ server <- function(input, output){
 
   spdf <- rmapshaper::ms_simplify(usa_composite())
   
+  # Create a new data frame "bs.data" that filters data by state input and excludes District of Columbia
+  bs.data <- reactive({
+    
+    bystate.data <- filter(final.df, State == input$stateChoice.Bs) %>%
+      filter(State != "District of Columbia")
+    
+    return(bystate.data)
+    
+  })
   
   output$map.As <- renderLeaflet({
     
@@ -171,7 +180,7 @@ server <- function(input, output){
       avg <- round(allStates$TotalAvg[1], digits = 2)
       
       valueBox(
-        paste0(avg), "Rate of Death per 100k", icon = icon("exclamation-circle"),
+        paste0(avg), "Rate of Death per 100k", icon = icon("user-times"),
         color = "red")
     })
   
@@ -181,49 +190,7 @@ server <- function(input, output){
         paste(input$yearChoice.As), "Year Selected", icon = icon("calendar"),
         color = "yellow")
     })
-  
-  
-  output$lineGraph.As <- renderPlot({
-    
-    ggthemr("dust")
-    
-    # Create a new data frame "as.data" that filters All State data
-    as.data <- filter(final.df, State == "All States")
-    
-    # Create a graph.As that takes as.data as data and Year as x-axis
-    graph.As <- ggplot(as.data, aes(x = Year))
-    
-    # Add a line graph with Rate as y-axis with color label "Death Rate" and size 1.5 to graph.As
-    graph.As <- graph.As + geom_line(aes(y = Rate, color = "Death Rate"), size = .9) 
-    graph.As <- graph.As + geom_point(aes(y = Rate, color = "Death Rate"), size = 2.2)
-    
-    # Add a line graph with LawTotal/120 as y-axis with color label "Total Number of Laws" and size 1.5 to graph.As
-    graph.As <- graph.As + geom_line(aes(y = LawTotal/120, colour = "Total Number of Laws"), size = .9)
-    graph.As <- graph.As + geom_point(aes(y = LawTotal/120, colour = "Total Number of Laws"), size = 2.2)
-    
-    # Define a secondary y-axis scale
-    graph.As <- graph.As + scale_y_continuous(sec.axis = sec_axis(trans = ~. * 120, name = "Total Number of Laws")) +
-      scale_x_continuous(breaks = round(seq(min(as.data$Year), max(as.data$Year), by = 1),1))
-    
-    # Add labels for x-axis, y-axis, and color panel
-    graph.As <- graph.As + labs(y = "Death Rate",
-                                x = "Year", 
-                                colour = "Legend") 
-    
-    return(graph.As)
-  })
-  
-  # Create a new data frame "bs.data" that filters data by state input and excludes District of Columbia
-  bs.data <- reactive({
-    
-    bystate.data <- filter(final.df, State == input$stateChoice.Bs) %>%
-    filter(State != "District of Columbia")
-    
-    return(bystate.data)
-    
-  })
-  
-  
+
   output$lineGraph.Bs.r <- renderPlot({
     
     ggthemr("dust")
@@ -254,7 +221,6 @@ server <- function(input, output){
     
     return(graph.Bs.l)
   })
-  
   
 }
 

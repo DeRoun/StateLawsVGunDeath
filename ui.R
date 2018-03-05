@@ -3,10 +3,22 @@ suppressPackageStartupMessages(library("shiny"))
 suppressPackageStartupMessages(library("leaflet"))
 suppressPackageStartupMessages(library("shinydashboard"))
 
+header <- dashboardHeader(title = "Gun Laws & Deaths",
+                          dropdownMenu(type = "notifications",
+                                       icon = icon("github"),
+                                       badgeStatus = NULL,
+                                       headerText = "Check Us Out", 
+                                       notificationItem("Github", icon = icon("github"),
+                                                        href = "https://github.com/DeRoun/StateLawsVGunDeath/")
+                                       ))
 
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
     menuItem("Start", tabName = "start", icon = icon("balance-scale")),
+      conditionalPanel("input.sidebarmenu === 'start'",
+        selectInput("sornot", label = "Select Relevant Data", 
+                         choices = list("Homicide Data Only" = 1, "Homicide and Suicide Data" = 2))
+    ),
     
     menuItem("All States", tabName = "all", icon = icon("map")),
       conditionalPanel("input.sidebarmenu === 'all'",
@@ -21,11 +33,11 @@ sidebar <- dashboardSidebar(
         selectInput("yearChoice.Bs", label = "Select Year", 
                          choices = year.vec)),
   
-    menuItem("Our Interpretation", tabName = "Interpretation", icon = icon("bookmark")),
+    menuItem("Our Interpretation", tabName = "int", icon = icon("bookmark")),
   
-    menuItem("Learn More", tabName = "Learn", icon = icon("leanpub")),
+    menuItem("Learn More", tabName = "le", icon = icon("leanpub")),
   
-    menuItem("About Us", tabName = "About", icon = icon("info"))
+    menuItem("About Us", tabName = "ab", icon = icon("info"))
 )
 )
 
@@ -54,12 +66,12 @@ body <- dashboardBody(
                 leafletOutput("map.Bs")
               ),
               box(
-                title = "State Name Graph Rate", status = "danger", solidHeader = TRUE,
+                title = "State Name Graph Rate", status = "warning", solidHeader = TRUE,
                 collapsible = FALSE,
                 plotOutput("lineGraph.Bs.r")
               ),
               box(
-                title = "State Name Data per Year", status = "danger", solidHeader = TRUE,
+                title = "State Name Data per Year", status = "warning", solidHeader = TRUE,
                 collapsible = FALSE,
                 tableOutput("table.Bs")
               ),
@@ -70,11 +82,16 @@ body <- dashboardBody(
               )
               
             )
-    )
+    ),
+    tabItem(tabName = "int"),
+    tabItem(tabName = "le"),
+    tabItem(tabName = "ab",
+            
+            includeHTML("html_pages/aboutUs.html"))
  ))
   
-ui <- dashboardPage(skin = "black",
-  dashboardHeader(title = "Gun Laws & Deaths"),
+ui <- dashboardPage(skin = "red",
+  header,
   sidebar,
   body
   )
