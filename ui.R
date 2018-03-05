@@ -54,15 +54,21 @@ body <- dashboardBody(
                 leafletOutput("map.Bs")
               ),
               box(
-                title = "State Name Graph Over Time", status = "danger", solidHeader = TRUE,
+                title = "State Name Graph Rate", status = "danger", solidHeader = TRUE,
                 collapsible = FALSE,
-                plotOutput("lineGraph.Bs")
+                plotOutput("lineGraph.Bs.r")
               ),
               box(
                 title = "State Name Data per Year", status = "danger", solidHeader = TRUE,
                 collapsible = FALSE,
                 tableOutput("table.Bs")
+              ),
+              box(
+                title = "State Name Graph Law Total", status = "danger", solidHeader = TRUE,
+                collapsible = FALSE,
+                plotOutput("lineGraph.Bs.l")
               )
+              
             )
     )
  ))

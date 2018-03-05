@@ -213,40 +213,48 @@ server <- function(input, output){
     return(graph.As)
   })
   
-  output$lineGraph.Bs <- renderPlot({
+  # Create a new data frame "bs.data" that filters data by state input and excludes District of Columbia
+  bs.data <- reactive({
+    
+    bystate.data <- filter(final.df, State == input$stateChoice.Bs) %>%
+    filter(State != "District of Columbia")
+    
+    return(bystate.data)
+    
+  })
+  
+  
+  output$lineGraph.Bs.r <- renderPlot({
     
     ggthemr("dust")
     
-    # Create a new data frame "bs.data" that filters data by state input and excludes District of Columbia
-    bs.data <- filter(final.df, State == input$stateChoice.Bs) %>%
-      filter(State != "District of Columbia")
+    bs <- bs.data()
     
-    # Create a graph.As that takes as.data as data and Year as x-axis
-    graph.Bs <- ggplot(bs.data, aes(x = Year))
+    graph.Bs.r <- ggplot(data = bs) +
+      geom_line(aes(x = Year, y = Rate), size = .9) + 
+      geom_point(aes(x = Year, y = Rate), size = 2.2) +
+      labs(x = "Year",
+           y = "Death Rate")
     
-    # Add a line graph with Rate as y-axis with color label "Death Rate" and size 1.5 to graph.As
-    graph.Bs <- graph.Bs + geom_line(aes(y = Rate, color = "Death Rate"), size = .9) +
-      scale_y_continuous(breaks=c(seq(0, 25, 5)))
-    
-    graph.Bs <- graph.Bs + geom_point(aes(y = Rate, color = "Death Rate"), size = 2.2) +
-      scale_y_continuous(breaks=c(seq(0, 25, 5)))
-    
-    # Add a line graph with LawTotal/120 as y-axis with color label "Total Number of Laws" and size 1.5 to graph.As
-    graph.Bs <- graph.Bs + geom_line(aes(y = LawTotal/2, colour = "Total Number of Laws"), size = .9)
-    graph.Bs <- graph.Bs + geom_point(aes(y = LawTotal/2, colour = "Total Number of Laws"), size = 2.2)
-    
-    # Define a secondary y-axis scale
-    graph.Bs <- graph.Bs + scale_y_continuous(sec.axis = sec_axis(trans = ~. * 2, name = "Total Number of Laws")) +
-      scale_x_continuous(breaks = round(seq(min(bs.data$Year), max(bs.data$Year), by = 1),1))
-    
-    # Add labels for x-axis, y-axis, and color panel
-    graph.Bs <- graph.Bs + labs(y = "Death Rate",
-                                x = "Year", 
-                                colour = "Legend") 
-    
-    return(graph.Bs)
+    return(graph.Bs.r)
     
   })
+  
+  output$lineGraph.Bs.l <- renderPlot({
+    
+    ggthemr("dust")
+    
+    bs <- bs.data()
+    
+    graph.Bs.l <- ggplot(data = bs) + 
+      geom_line(aes(x = Year, y = LawTotal), size = .9) + 
+      geom_point(aes(x = Year, y = LawTotal), size = 2.2) +
+      labs(x = "Year",
+           y = "Total Number of Laws")
+    
+    return(graph.Bs.l)
+  })
+  
   
 }
 
