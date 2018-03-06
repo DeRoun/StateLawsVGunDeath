@@ -2,6 +2,7 @@ suppressPackageStartupMessages(library("markdown"))
 suppressPackageStartupMessages(library("shiny"))
 suppressPackageStartupMessages(library("leaflet"))
 suppressPackageStartupMessages(library("shinydashboard"))
+suppressPackageStartupMessages(library("DT"))
 
 header <- dashboardHeader(title = "Gun Laws & Deaths",
                           dropdownMenu(type = "notifications",
@@ -14,10 +15,14 @@ header <- dashboardHeader(title = "Gun Laws & Deaths",
 
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
-    menuItem("Start", tabName = "start", icon = icon("balance-scale")),
-      conditionalPanel("input.sidebarmenu === 'start'",
-        selectInput("sornot", label = "Select Relevant Data", 
-                         choices = list("Homicide Data Only" = 1, "Homicide and Suicide Data" = 2))
+              
+    selectInput("sornot", label = "Select Relevant Death Data", 
+                          choices = list("All Gun Death" = "final.df",
+                                         "Excluding Suicide" = "final.df.ns")
+    ),
+    
+    menuItem("Start", tabName = "start", icon = icon("balance-scale")
+             
     ),
     
     menuItem("All States", tabName = "all", icon = icon("map")),
@@ -72,8 +77,8 @@ body <- dashboardBody(
               ),
               box(
                 title = "State Name Data per Year", status = "warning", solidHeader = TRUE,
-                collapsible = FALSE,
-                tableOutput("table.Bs")
+                collapsible = FALSE, height = "462",
+                DTOutput("table.Bs")
               ),
               box(
                 title = "State Name Graph Law Total", status = "danger", solidHeader = TRUE,
@@ -85,9 +90,7 @@ body <- dashboardBody(
     ),
     tabItem(tabName = "int"),
     tabItem(tabName = "le"),
-    tabItem(tabName = "ab",
-            
-            includeHTML("html_pages/aboutUs.html"))
+    tabItem(tabName = "ab")
  ))
   
 ui <- dashboardPage(skin = "red",

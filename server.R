@@ -9,6 +9,8 @@ suppressPackageStartupMessages(library("mapview"))
 suppressPackageStartupMessages(library("htmlwidgets"))
 suppressPackageStartupMessages(library("albersusa"))
 suppressPackageStartupMessages(library("ggthemr"))
+suppressPackageStartupMessages(library("rlang"))
+suppressPackageStartupMessages(library("DT"))
 
 server <- function(input, output){
   
@@ -19,7 +21,7 @@ server <- function(input, output){
   # Create a new data frame "bs.data" that filters data by state input and excludes District of Columbia
   bs.data <- reactive({
     
-    bystate.data <- filter(final.df, State == input$stateChoice.Bs) %>%
+    bystate.data <- filter(eval(parse(text = input$sornot)), State == input$stateChoice.Bs) %>%
       filter(State != "District of Columbia")
     
     return(bystate.data)
@@ -30,17 +32,16 @@ server <- function(input, output){
     
     # Filters data frame bases on All State Control widgets
     
-    remove <- c("All States")
-    allStates <- filter(final.df, Year == input$yearChoice.As) %>%
-      filter(!State %in% remove)
+    allStates <- filter(eval(parse(text = input$sornot)), Year == input$yearChoice.As) %>%
+      filter(!State %in% "All States")
     allStates <- allStates[match(spdf$name, allStates$State),]
     
     # Sets bins for fill color, then creates colorbin with set of colors equal to
     # the bin in relation to allStates.df$Rate.
     
-    bins <- seq(2, 35, by = 3)
+    bins <- seq(min(allStates$Rate,na.rm=T), max(allStates$Rate,na.rm=T), l = 8)
     pal <- colorBin(c("#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", 
-                      "#ef3b2c", "#cb181d", "#a50f15", "#67000d"),
+                      "#ef3b2c", "#cb181d", "#a50f15"),
                     domain = allStates$Rate, bins = bins)
     
     # Creates projection for hawaii and Alaska on all state map
@@ -84,7 +85,7 @@ server <- function(input, output){
     
     # Filters data frame bases on By State Control widgets
     
-    allStates <- filter(final.df, Year == input$yearChoice.Bs) %>%
+    allStates <- filter(eval(parse(text = input$sornot)), Year == input$yearChoice.Bs) %>%
       filter(!State %in% "All States")
     byStates <- filter(allStates, State == input$stateChoice.Bs)
     byStates <- byStates[match(spdf$name, byStates$State),]
@@ -105,7 +106,7 @@ server <- function(input, output){
     # Sets bins for fill color, then creates colorbin with set of colors equal to
     # the bin in relation to allStates.df$Rate.
     
-    bins <- seq(2, 35, by = 3)
+    bins <- seq(min(allStates$Rate,na.rm=T), max(allStates$Rate,na.rm=T), l = 8)
     pal <- colorBin(c("#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", 
                       "#ef3b2c", "#cb181d", "#a50f15", "#67000d"),
                     domain = allStates$Rate, bins = bins)
@@ -150,17 +151,23 @@ server <- function(input, output){
   })
   
   output$table.Bs <-
-    renderTable({
-      byStates <- filter(final.df, State == input$stateChoice.Bs) %>%
+    DT::renderDT({
+      byStates <- filter(eval(parse(text = input$sornot)), State == input$stateChoice.Bs) %>%
         filter(!State %in% "All States") %>%
         select(Year, "Number of Total Laws" = LawTotal, "Death Rate (by Firearm)" = Rate)
+      byStates <- datatable(byStates, options = list(pageLength = 7, dom = "ftipr",
+                                                     initComplete = JS(
+                                                       "function(settings, json) {",
+                                                       "$(this.api().table().body()).css({'font-size': '125%'});",
+                                                       "}")
+                                                     ), rownames= FALSE)
       return(byStates)
-    }, align = "ccc")
+    })
   
   output$avgGunLawBox.As <-
     renderValueBox({
       
-      allStates <- filter(final.df, Year == input$yearChoice.As) %>%
+      allStates <- filter(eval(parse(text = input$sornot)), Year == input$yearChoice.As) %>%
         filter(!State %in% "All States") %>%
         na.omit(LawTotal) %>%
         summarise(TotalAvg = mean(LawTotal))
@@ -174,7 +181,7 @@ server <- function(input, output){
   output$avgRateBox.As <-
     renderValueBox({
       
-      allStates <- filter(final.df, Year == input$yearChoice.As) %>%
+      allStates <- filter(eval(parse(text = input$sornot)), Year == input$yearChoice.As) %>%
         filter(!State %in% "All States") %>%
         summarise(TotalAvg = mean(Rate))
       avg <- round(allStates$TotalAvg[1], digits = 2)
