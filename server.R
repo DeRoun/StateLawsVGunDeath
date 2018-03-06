@@ -218,7 +218,8 @@ server <- function(input, output){
     
     ggthemr("dust")
     
-    bs <- bs.data()
+    bs <- filter(final.df, State == input$stateChoice.Bs) %>%
+      filter(State != "District of Columbia")
     
     graph.Bs.l <- ggplot(data = bs) + 
       geom_line(aes(x = Year, y = LawTotal), size = .9) + 
