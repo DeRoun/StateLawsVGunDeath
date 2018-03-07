@@ -33,13 +33,13 @@ server <- function(input, output){
     # Filters data frame bases on All State Control widgets
     
     allStates <- filter(eval(parse(text = input$sornot)), Year == input$yearChoice.As) %>%
-      filter(!State %in% "All States")
+      filter(!State %in% c("All States", "District of Columbia"))
     allStates <- allStates[match(spdf$name, allStates$State),]
     
     # Sets bins for fill color, then creates colorbin with set of colors equal to
     # the bin in relation to allStates.df$Rate.
     
-    bins <- seq(min(allStates$Rate,na.rm=T), max(allStates$Rate,na.rm=T), l = 8)
+    bins <- seq(min(allStates$Rate, na.rm=T), max(allStates$Rate, na.rm=T), l = 8)
     pal <- colorBin(c("#fff5f0", "#fee0d2", "#fcbba1", "#fc9272", "#fb6a4a", 
                       "#ef3b2c", "#cb181d", "#a50f15"),
                     domain = allStates$Rate, bins = bins)
@@ -146,8 +146,6 @@ server <- function(input, output){
                 title = "Rate per 100,000 People",
                 position = "bottomright")
     
-    
-    
   })
   
   output$table.Bs <-
@@ -206,6 +204,7 @@ server <- function(input, output){
     
     graph.Bs.r <- ggplot(data = bs) +
       geom_line(aes(x = Year, y = Rate), size = .9) + 
+      geom_point(aes(x = Year, y = Rate), color = "white", size = 4.4) +
       geom_point(aes(x = Year, y = Rate), size = 2.2) +
       labs(x = "Year",
            y = "Death Rate")
@@ -222,7 +221,8 @@ server <- function(input, output){
       filter(State != "District of Columbia")
     
     graph.Bs.l <- ggplot(data = bs) + 
-      geom_line(aes(x = Year, y = LawTotal), size = .9) + 
+      geom_line(aes(x = Year, y = LawTotal), size = .9) +
+      geom_point(aes(x = Year, y = LawTotal), color = "white", size = 4.4) +
       geom_point(aes(x = Year, y = LawTotal), size = 2.2) +
       labs(x = "Year",
            y = "Total Number of Laws")

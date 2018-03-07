@@ -17,7 +17,7 @@ sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
               
     selectInput("sornot", label = "Select Relevant Death Data", 
-                          choices = list("All Gun Death" = "final.df",
+                          choices = list("All Gun Deaths" = "final.df",
                                          "Excluding Suicide" = "final.df.ns")
     ),
     
@@ -48,7 +48,8 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   tabItems(
-    tabItem(tabName = "start"),
+    tabItem(tabName = "start",
+            includeHTML("start.html")),
     
     tabItem(tabName = "all",
             box(
