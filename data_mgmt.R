@@ -1,5 +1,3 @@
-# Required Libraries:
-
 suppressPackageStartupMessages(library(dplyr))
 
 # Creates variable with raw Firearm Law Data

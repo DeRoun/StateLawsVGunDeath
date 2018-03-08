@@ -11,8 +11,13 @@ suppressPackageStartupMessages(library("albersusa"))
 suppressPackageStartupMessages(library("ggthemr"))
 suppressPackageStartupMessages(library("rlang"))
 suppressPackageStartupMessages(library("DT"))
+suppressPackageStartupMessages(library("Cairo"))
 
 server <- function(input, output){
+  
+  # Produces smoother plots using Cairo library
+  
+  options(shiny.usecairo=T)
   
   # Map data from albersusa package for USA map with compatable alaska and hawaii projections
 
@@ -95,9 +100,12 @@ server <- function(input, output){
     center <- data.frame(state.name, state.center)
     
     # Change Alaska Coord
+    
     center$x[center$x == -127.2500] <- -112
     center$y[center$y == 49.2500] <- 27
+    
     # Change Hawaii Coord
+    
     center$x[center$x == -126.25000] <- -102.3
     center$y[center$y == 31.7500] <- 24.5
     
@@ -149,6 +157,9 @@ server <- function(input, output){
   })
   
   output$table.Bs <-
+    
+    # Renders Datatable of the raw-ish data used got the By stat plots as a more detailed alternative
+    
     DT::renderDT({
       byStates <- filter(eval(parse(text = input$sornot)), State == input$stateChoice.Bs) %>%
         filter(!State %in% "All States") %>%
@@ -159,10 +170,14 @@ server <- function(input, output){
                                                        "$(this.api().table().body()).css({'font-size': '125%'});",
                                                        "}")
                                                      ), rownames= FALSE)
+      
       return(byStates)
     })
   
   output$avgGunLawBox.As <-
+    
+    # Renders Value Box for the mean of a years avg state law total
+    
     renderValueBox({
       
       allStates <- filter(eval(parse(text = input$sornot)), Year == input$yearChoice.As) %>%
@@ -177,6 +192,9 @@ server <- function(input, output){
     })
   
   output$avgRateBox.As <-
+    
+    # Renders Value Box for the mean of a years avg state firearm death rate
+    
     renderValueBox({
       
       allStates <- filter(eval(parse(text = input$sornot)), Year == input$yearChoice.As) %>%
@@ -190,13 +208,20 @@ server <- function(input, output){
     })
   
   output$yearChoiceBox.As <-
+    
+    # Renders Value Box that tells you the year selected
+    
     renderValueBox({
       valueBox(
         paste(input$yearChoice.As), "Year Selected", icon = icon("calendar"),
         color = "yellow")
     })
 
-  output$lineGraph.Bs.r <- renderPlot({
+  output$lineGraph.Bs.r <- 
+    
+    # Renders a line graph showing the change in death rate over each year for a specific state
+    
+    renderPlot({
     
     ggthemr("dust")
     
@@ -214,7 +239,11 @@ server <- function(input, output){
     
   })
   
-  output$lineGraph.Bs.l <- renderPlot({
+  output$lineGraph.Bs.l <- 
+    
+    # Renders a line graph showing the change in law totals over each year for a specific state
+    
+    renderPlot({
     
     ggthemr("dust")
     
@@ -230,6 +259,56 @@ server <- function(input, output){
     
     return(graph.Bs.l)
   })
+  
+  output$scatterCorr <- 
+    
+    # Renders a scatter plot showing the correlation between death rate and gin laws
+    
+    renderPlot({
+    
+    ggthemr("dust")
+    
+    corr <-filter(eval(parse(text = input$sornot)),
+                  !State %in% c("All States", "District of Columbia"))
+    
+    plot.scatter <- ggplot(data = corr) +
+      geom_jitter(aes(x = LawTotal, y = Rate)) +
+      labs(x = "Total Number of Laws",
+           y = "Firearm Related Death Rate") +
+      geom_smooth(aes(x = LawTotal, y = Rate), model = lm, size = 1.5)
+    
+    return(plot.scatter)
+    
+  })
+  
+  output$corrBox <-
+    
+    # Renders Value Box for the correlation coefficient of the scatter plot
+    
+    renderValueBox({
+      
+      corr <-filter(eval(parse(text = input$sornot)),
+                    !State %in% c("All States", "District of Columbia"))
+      
+      box <- valueBox(
+        paste(round(cor(corr$LawTotal, corr$Rate), digits = 2)),
+        "Correlation Coefficient", icon = icon("question-circle"),
+        color = "green")
+      
+      return(box)
+      
+    })
+  
+  output$effectBox <-
+    
+    # Renders Value Box stateing if the correlation can save lives
+    
+    renderValueBox({
+      valueBox(
+        "Yes", "Do Gun Laws save lives?", icon = icon("heartbeat"),
+        color = "red")
+    })
+  
 }
 
 shinyServer(server)

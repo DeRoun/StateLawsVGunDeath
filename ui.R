@@ -4,6 +4,8 @@ suppressPackageStartupMessages(library("leaflet"))
 suppressPackageStartupMessages(library("shinydashboard"))
 suppressPackageStartupMessages(library("DT"))
 
+# Creates header for Shiny UI dashboard
+
 header <- dashboardHeader(title = "Gun Laws & Deaths",
                           dropdownMenu(type = "notifications",
                                        icon = icon("github"),
@@ -13,9 +15,11 @@ header <- dashboardHeader(title = "Gun Laws & Deaths",
                                                         href = "https://github.com/DeRoun/StateLawsVGunDeath/")
                                        ))
 
+# Creates sidebar for Shiny UI dashboard
+
 sidebar <- dashboardSidebar(
   sidebarMenu(id = "sidebarmenu",
-              
+  
     selectInput("sornot", label = "Select Relevant Death Data", 
                           choices = list("All Gun Deaths" = "final.df",
                                          "Excluding Suicide" = "final.df.ns")
@@ -46,10 +50,12 @@ sidebar <- dashboardSidebar(
 )
 )
 
+# Creates body of the UI to be used in Shiny
+
 body <- dashboardBody(
   tabItems(
-    tabItem(tabName = "start"
-            #,includeHTML("start.html")
+    tabItem(tabName = "start",
+            includeHTML("www/start.html")
             ),
     
     tabItem(tabName = "all",
@@ -73,7 +79,7 @@ body <- dashboardBody(
                 leafletOutput("map.Bs")
               ),
               box(
-                title = "Deathe Rate By Year", status = "warning", solidHeader = TRUE,
+                title = "Death Rate By Year", status = "warning", solidHeader = TRUE,
                 collapsible = FALSE,
                 plotOutput("lineGraph.Bs.r")
               ),
@@ -90,16 +96,30 @@ body <- dashboardBody(
               
             )
     ),
-    tabItem(tabName = "int"
-            #,includeHTML("interp.html")
+    tabItem(tabName = "int",
+            box(
+              title = "Correlational Scatter Plot", status = "danger", solidHeader = TRUE,
+              collapsible = FALSE, width = 14,
+              plotOutput("scatterCorr", height = 500)
             ),
-    tabItem(tabName = "le"
-            #,includeHTML("learnmore.html")
+            fluidRow(column(12,
+                     box(
+                       title = "Our Interpretation", status = "warning", solidHeader = TRUE,
+                       collapsible = FALSE,
+                       includeHTML("www/interp.html")
             ),
-    tabItem(tabName = "ab"
-            #,includeHTML("aboutus.html")
+                     valueBoxOutput("corrBox"),
+                     valueBoxOutput("effectBox"))
+            )),
+    tabItem(tabName = "le",
+            includeHTML("www/learnmore.html")
+            ),
+    tabItem(tabName = "ab",
+            includeHTML("www/aboutus.html")
             )
  ))
+
+# Define UI for Shiny Application
   
 ui <- dashboardPage(skin = "red",
   header,
