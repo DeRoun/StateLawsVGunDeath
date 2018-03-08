@@ -206,6 +206,7 @@ server <- function(input, output){
       geom_line(aes(x = Year, y = Rate), size = .9) + 
       geom_point(aes(x = Year, y = Rate), color = "white", size = 4.4) +
       geom_point(aes(x = Year, y = Rate), size = 2.2) +
+      geom_smooth(aes(x = Year, y = Rate), fill = NA, model = lm, size = .9) +
       labs(x = "Year",
            y = "Death Rate")
     
