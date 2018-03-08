@@ -48,8 +48,9 @@ sidebar <- dashboardSidebar(
 
 body <- dashboardBody(
   tabItems(
-    tabItem(tabName = "start",
-            includeHTML("start.html")),
+    tabItem(tabName = "start"
+            #,includeHTML("start.html")
+            ),
     
     tabItem(tabName = "all",
             box(
@@ -62,36 +63,42 @@ body <- dashboardBody(
               valueBoxOutput("avgRateBox.As"),
               valueBoxOutput("yearChoiceBox.As")
             )
-    ),
+            ),
     
     tabItem(tabName = "by",
             fluidRow(
               box(
-                title = "State Name", status = "danger", solidHeader = TRUE,
+                title = "By State", status = "danger", solidHeader = TRUE,
                 collapsible = FALSE,
                 leafletOutput("map.Bs")
               ),
               box(
-                title = "State Name Graph Rate", status = "warning", solidHeader = TRUE,
+                title = "Deathe Rate By Year", status = "warning", solidHeader = TRUE,
                 collapsible = FALSE,
                 plotOutput("lineGraph.Bs.r")
               ),
               box(
-                title = "State Name Data per Year", status = "warning", solidHeader = TRUE,
+                title = "'Raw' Data By Year", status = "warning", solidHeader = TRUE,
                 collapsible = FALSE, height = "462",
                 DTOutput("table.Bs")
               ),
               box(
-                title = "State Name Graph Law Total", status = "danger", solidHeader = TRUE,
+                title = "Law Total By Year", status = "danger", solidHeader = TRUE,
                 collapsible = FALSE,
                 plotOutput("lineGraph.Bs.l")
               )
               
             )
     ),
-    tabItem(tabName = "int"),
-    tabItem(tabName = "le"),
-    tabItem(tabName = "ab")
+    tabItem(tabName = "int"
+            #,includeHTML("interp.html")
+            ),
+    tabItem(tabName = "le"
+            #,includeHTML("learnmore.html")
+            ),
+    tabItem(tabName = "ab"
+            #,includeHTML("aboutus.html")
+            )
  ))
   
 ui <- dashboardPage(skin = "red",

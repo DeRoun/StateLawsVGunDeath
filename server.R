@@ -229,7 +229,6 @@ server <- function(input, output){
     
     return(graph.Bs.l)
   })
-  
 }
 
 shinyServer(server)
