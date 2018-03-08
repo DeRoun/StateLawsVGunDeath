@@ -4,6 +4,8 @@ suppressPackageStartupMessages(library("leaflet"))
 suppressPackageStartupMessages(library("shinydashboard"))
 suppressPackageStartupMessages(library("DT"))
 
+source("data_mgmt.R")
+
 # Creates header for Shiny UI dashboard
 
 header <- dashboardHeader(title = "Gun Laws & Deaths",

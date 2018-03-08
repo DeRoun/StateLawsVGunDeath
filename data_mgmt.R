@@ -1,12 +1,12 @@
-suppressPackageStartupMessages(library(dplyr))
+suppressPackageStartupMessages(library("dplyr"))
 
 # Creates variable with raw Firearm Law Data
 
-orig.GL <- read.csv(file = "data/raw_state_gun_laws_data.csv", stringsAsFactor = F, fileEncoding="UTF-8-BOM")
+orig.GL <- read.csv(file = "Data/raw_state_gun_laws_data.csv", stringsAsFactor = F, fileEncoding="UTF-8-BOM")
 
 # Creates variable with raw Gun Death Data
 
-orig.CDC <- read.csv(file = "data/raw_cdc_gun_deaths.csv", stringsAsFactor = F, fileEncoding="UTF-8-BOM")
+orig.CDC <- read.csv(file = "Data/raw_cdc_gun_deaths.csv", stringsAsFactor = F, fileEncoding="UTF-8-BOM")
 
 # Simplifies CDC gun death data
 
@@ -44,7 +44,7 @@ year.vec <- c(allStates.df$Year)
 
 # Creates variable with raw Gun Death Data (NO SUICIDE)
 
-orig.CDC.ns <- read.csv(file = "data/raw_cdc_gun_deaths_ns.csv", stringsAsFactor = F, fileEncoding="UTF-8-BOM")
+orig.CDC.ns <- read.csv(file = "Data/raw_cdc_gun_deaths_ns.csv", stringsAsFactor = F, fileEncoding="UTF-8-BOM")
 
 # Simplifies CDC gun death data (NO SUICIDE)
 

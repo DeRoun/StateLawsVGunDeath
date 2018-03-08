@@ -13,6 +13,8 @@ suppressPackageStartupMessages(library("rlang"))
 suppressPackageStartupMessages(library("DT"))
 suppressPackageStartupMessages(library("Cairo"))
 
+source("data_mgmt.R")
+
 server <- function(input, output){
   
   # Produces smoother plots using Cairo library
